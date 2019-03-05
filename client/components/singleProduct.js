@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import axios from 'axios'
 import {connect} from 'react-redux'
 import {updateItemQuantity, updateItemQuantityLocal} from '../store'
+import {gotProductFromServer} from '../store/product'
+
 class SingleProduct extends Component {
   constructor() {
     super()
@@ -46,29 +48,23 @@ class SingleProduct extends Component {
   }
 
   handleChange(evt) {
-    console.log(evt.target.value)
-
     this.setState({
       itemQuantity: evt.target.value
     })
   }
 
   increment() {
-    this.setState({
-      itemQuantity: this.state.itemQuantity + 1
-    })
+    this.setState(preState => ({itemQuantity: preState.itemQuantity + 1}))
   }
 
   decrement() {
     if (this.state.itemQuantity > 1) {
-      this.setState({
-        itemQuantity: this.state.itemQuantity - 1
-      })
+      this.setState(preState => ({itemQuantity: preState.itemQuantity - 1}))
     }
   }
 
   render() {
-    const {name, imageUrl, price, description} = this.state.product
+    const {id, name, imageUrl, price, description} = this.state.product
     return (
       <div className="single-product-div">
         <div className="row-gap">
@@ -96,16 +92,28 @@ class SingleProduct extends Component {
         <div id="popUp">
           {this.state.itemQuantity} {name} added to cart !
         </div>
+        <br />
+        {this.props.isAdmin && (
+          <button
+            type="submit"
+            onClick={() => this.props.gotProductFromServer(id)}
+          >
+            Edit
+          </button>
+        )}
+
       </div>
     )
   }
 }
 
 const mapStateToProps = ({user}) => ({
-  isLoggedIn: !!user.id
+  isLoggedIn: !!user.id,
+  isAdmin: user.isAdmin
 })
 
 export default connect(mapStateToProps, {
   updateItemQuantity,
-  updateItemQuantityLocal
+  updateItemQuantityLocal,
+  gotProductFromServer
 })(SingleProduct)

@@ -13,7 +13,8 @@ async function seed() {
       password: '123',
       firstName: 'cody',
       lastName: 'dog',
-      phone: '(123) 456-7899'
+      phone: '(123) 456-7899',
+      isAdmin: true
     }),
     User.create({
       email: 'murphy@email.com',

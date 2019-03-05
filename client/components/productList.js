@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import Product from './product'
+import {connect} from 'react-redux'
+import {gotProductFromServer} from '../store/product'
 
-export default class ProductList extends Component {
+class ProductList extends Component {
   _isMounted = false
 
   constructor() {
@@ -12,6 +14,7 @@ export default class ProductList extends Component {
     }
 
     this.handleClick = this.handleClick.bind(this)
+    this.handleDispatchProduct = this.handleDispatchProduct.bind(this)
   }
 
   async componentDidMount() {
@@ -26,11 +29,21 @@ export default class ProductList extends Component {
     this.props.history.push(`/products/${productId}`)
   }
 
+  handleDispatchProduct(productId) {
+    this.props.dispatchProduct(productId)
+  }
+
   render() {
     return (
       <div id="product-container">
         {this.state.products.map(pt => (
-          <Product key={pt.id} product={pt} handleClick={this.handleClick} />
+          <Product
+            key={pt.id}
+            product={pt}
+            handleClick={this.handleClick}
+            handleDispatchProduct={this.handleDispatchProduct}
+            isAdmin={this.props.user.isAdmin}
+          />
         ))}
       </div>
     )
@@ -40,3 +53,17 @@ export default class ProductList extends Component {
     this._isMounted = false
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    user: state.user
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatchProduct: productId => dispatch(gotProductFromServer(productId))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductList)

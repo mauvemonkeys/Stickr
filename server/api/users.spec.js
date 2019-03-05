@@ -13,7 +13,7 @@ describe('User routes', () => {
 
   describe('/api/users/', () => {
     const Henry = {
-      email: 'HenryGod@gmail.com',
+      email: 'HenryGod@gmail.com'.toLowerCase(),
       password: '666',
       firstName: 'Henry',
       lastName: 'God',
@@ -22,7 +22,7 @@ describe('User routes', () => {
 
     beforeEach(() => {
       return User.create({
-        email: 'HenryGod@gmail.com',
+        email: 'HenryGod@gmail.com'.toLowerCase(),
         password: '666',
         firstName: 'Henry',
         lastName: 'God',
@@ -38,7 +38,7 @@ describe('User routes', () => {
       expect(res.body).to.be.an('object')
       expect(res.body.email).to.be.equal(Henry.email)
       expect(res.body).to.deep.include({
-        email: 'HenryGod@gmail.com',
+        email: 'HenryGod@gmail.com'.toLowerCase(),
         firstName: 'Henry',
         lastName: 'God',
         phone: '66612357'

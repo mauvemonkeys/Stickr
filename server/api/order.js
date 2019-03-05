@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {Product, Order} = require('../db/models')
+const stripe = require('stripe')('sk_test_PpLkvdYD7mbL5j0o8QWpRtST')
 
 module.exports = router
 
@@ -83,6 +84,34 @@ router.put('/:userId/products/:productId/:from', async (req, res, next) => {
   } catch (err) {
     next(err)
   }
+})
+
+//Pay for Items
+router.post('/:userId/charge', async (req, res, next) => {
+  const orderLines = await Order.findAll({
+    where: {
+      orderStatus: false,
+      userId: req.params.userId
+    },
+    include: [{model: Product}]
+  })
+
+  const orderTotal = orderLines.reduce((total, line) => {
+    return total + line.itemQuantity * Number(line.product.price)
+  }, 0)
+
+  //try {
+  let {status} = await stripe.charges.create({
+    amount: orderTotal * 100,
+    currency: 'usd',
+    description: 'An example charge',
+    source: req.body.token
+  })
+
+  res.json({status})
+  //} catch (err) {
+  //res.sendStatus(500)
+  //}
 })
 
 //Checkout Items

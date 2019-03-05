@@ -9,7 +9,7 @@ const User = db.model('user')
 
 describe('auth routes', () => {
   const Henry = {
-    email: 'HenryGod@gmail.com',
+    email: 'HenryGod@gmail.com'.toLowerCase(),
     password: '666',
     firstName: 'Henry',
     lastName: 'God',
@@ -24,14 +24,15 @@ describe('auth routes', () => {
     it('POST /auth/login logs in user successfully', async () => {
       const res = await request(app)
         .post('/auth/login')
-        .send({email: 'HenryGod@gmail.com', password: '666'})
+        .send({email: 'HenryGod@gmail.com'.toLowerCase(), password: '666'})
         .expect(200)
 
+      console.log(res.body)
       expect(res.body).to.be.an('object')
       expect(res.body.id).to.be.equal(1)
       expect(res.body.email).to.be.equal(Henry.email)
       expect(res.body).to.deep.include({
-        email: 'HenryGod@gmail.com',
+        email: 'HenryGod@gmail.com'.toLowerCase(),
         firstName: 'Henry',
         lastName: 'God',
         phone: '66612357'
@@ -41,14 +42,17 @@ describe('auth routes', () => {
     it('POST /auth/login does not log in user with incorrect password', async () => {
       await request(app)
         .post('/auth/login')
-        .send({email: 'HenryGod@gmail.com', password: '6666'})
+        .send({email: 'HenryGod@gmail.com'.toLowerCase(), password: '6666'})
         .expect(401)
     })
 
     it("POST /auth/login does not log in user that doesn't exist", async () => {
       await request(app)
         .post('/auth/login')
-        .send({email: 'AbbeyMondshein@gmail.com', password: 'sdfsdfsfd'})
+        .send({
+          email: 'AbbeyMondshein@gmail.com'.toLowerCase(),
+          password: 'sdfsdfsfd'
+        })
         .expect(401)
     })
   })
@@ -92,7 +96,7 @@ describe('auth routes', () => {
       const sessionApp = session(app)
       await sessionApp
         .post('/auth/login')
-        .send({email: 'HenryGod@gmail.com', password: '666'})
+        .send({email: 'HenryGod@gmail.com'.toLowerCase(), password: '666'})
 
       const res = await sessionApp.get('/auth/me').expect(200)
 
@@ -100,7 +104,7 @@ describe('auth routes', () => {
       expect(res.body.id).to.be.equal(1)
       expect(res.body.email).to.be.equal(Henry.email)
       expect(res.body).to.deep.include({
-        email: 'HenryGod@gmail.com',
+        email: 'HenryGod@gmail.com'.toLowerCase(),
         firstName: 'Henry',
         lastName: 'God',
         phone: '66612357'

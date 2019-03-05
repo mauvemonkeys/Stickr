@@ -3,6 +3,8 @@ import CartLine from './cartLine'
 import {connect} from 'react-redux'
 import axios from 'axios'
 import {clearCart} from '../store/cart'
+import {Elements, StripeProvider} from 'react-stripe-elements'
+import CheckoutForm from './checkoutForm'
 
 class Cart extends Component {
   constructor() {
@@ -18,6 +20,8 @@ class Cart extends Component {
   }
 
   render() {
+    const {user, history} = this.props
+
     return (
       <div id="cart">
         <h2>Cart</h2>
@@ -33,9 +37,22 @@ class Cart extends Component {
           )}{' '}
         </div>
         <div>
-          <button type="button" onClick={this.handleClick}>
-            CHECKOUT
-          </button>
+          <StripeProvider apiKey="pk_test_QorOLkP9hIdDgJ1rJICv33A8">
+            <Elements>
+              <CheckoutForm user={this.props.user} />
+            </Elements>
+          </StripeProvider>
+        </div>
+        <div>
+          {user.id ? (
+            <button type="button" onClick={this.handleClick}>
+              CHECKOUT
+            </button>
+          ) : (
+            <button type="button" onClick={() => history.push('/login')}>
+              CHECKOUT
+            </button>
+          )}
         </div>
       </div>
     )

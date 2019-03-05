@@ -24,22 +24,45 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   const googleConfig = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK
+    callbackURL: process.env.GOOGLE_CALLBACK,
+    userProfileURL: process.env.USER_PROFILE_URL
   }
 
   const strategy = new GoogleStrategy(
     googleConfig,
-    (token, refreshToken, profile, done) => {
+    async (token, refreshToken, profile, done) => {
       const googleId = profile.id
       const name = profile.displayName
-      const email = profile.emails[0].value
+      const email = profile.emails[0].value.toLowerCase()
+      try {
+        let user = await User.findOne({
+          where: {googleId}
+        })
 
-      User.findOrCreate({
-        where: {googleId},
-        defaults: {name, email}
-      })
-        .then(([user]) => done(null, user))
-        .catch(done)
+        if (!user) {
+          user = await User.findOne({
+            where: {email}
+          })
+
+          if (user) {
+            user.googleId = googleId
+          } else {
+            const splitName = name.split(' ')
+            user = new User({
+              firstName: splitName[0],
+              lastName: splitName[splitName.length - 1] || '',
+              email,
+              googleId
+            })
+          }
+
+          user = await user.save()
+        }
+
+        done(null, user)
+      } catch (err) {
+        done(err)
+      }
     }
   )
 
@@ -50,7 +73,7 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   router.get(
     '/callback',
     passport.authenticate('google', {
-      successRedirect: '/home',
+      successRedirect: '/products',
       failureRedirect: '/login'
     })
   )

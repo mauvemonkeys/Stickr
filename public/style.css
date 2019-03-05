@@ -102,6 +102,12 @@ img {
   border-radius: 50%;
   background-color: white;
 }
+.single-product-div {
+  background-color: rgba(250, 235, 215, 0.338);
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 5px;
+}
 
 #form {
   background-color: rgba(250, 235, 215, 0.338);

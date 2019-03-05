@@ -5,7 +5,17 @@ const {Product} = require('../db/models')
 router.get('/', async (req, res, next) => {
   try {
     const products = await Product.findAll()
-    res.send(products)
+    const newProducts = products.map(product => {
+      const {id, name, description, imageUrl, price} = product.dataValues
+      return {
+        id,
+        name,
+        description,
+        imageUrl,
+        price
+      }
+    })
+    res.send(newProducts)
   } catch (err) {
     next(err)
   }
