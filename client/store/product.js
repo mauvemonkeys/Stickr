@@ -35,7 +35,7 @@ export const updateProductToServer = product => async dispatch => {
       `/api/admin/products/${product.id}`,
       product
     )
-    dispatch(gotProduct(updatedProduct))
+    dispatch(updateProduct(updatedProduct))
     history.push(`/products/${product.id}`)
   } catch (err) {
     console.error(err)
@@ -50,7 +50,7 @@ export default function(state = defaultProduct, action) {
     case GOT_PRODUCT:
       return action.product
     case UPDATE_PRODUCT:
-      return {...state}
+      return {...state, ...action.product}
     default:
       return state
   }
